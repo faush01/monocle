@@ -2,10 +2,20 @@ from flask import Flask, render_template, send_from_directory, jsonify, request
 from datetime import datetime, timedelta
 import sqlite3
 import os
+import sys
+import os.path
 
 app = Flask(__name__)
 
-
+db_path = "data.db"
+if len(sys.argv) > 1:
+    db_path = sys.argv[1]
+	
+if not os.path.isfile(db_path):
+    print ("Database file not found : " + db_path)
+    exit(-1)
+	
+	
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'fav.png', mimetype='image/png')
@@ -21,7 +31,7 @@ def home():
 @app.route("/get_history_data")
 def get_data():
 
-    conn = sqlite3.connect("../scripts/monitor/data.db", detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
     cur = conn.cursor()
 
     interval = request.args.get('interval')
@@ -121,4 +131,4 @@ def get_data():
     return jsonify(data_set)
 
 
-app.run()
+app.run(host='0.0.0.0', port=5000, debug=False)
