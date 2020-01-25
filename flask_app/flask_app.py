@@ -69,7 +69,7 @@ def get_data():
 
     if interval == "1min":
         sql = """
-        SELECT timestamp,
+        SELECT strftime('%Y-%m-%dT%H:%M:%S', timestamp) AS log_time,
                --pulse_count,
                --time_span,
                --((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS avg_pps,
@@ -95,15 +95,6 @@ def get_data():
         FROM log
         where timestamp >=  ? and timestamp < ?
         GROUP BY strftime('%Y-%m-%dT%H:00:00', timestamp)
-        """
-
-    elif interval == "daily":
-        sql = """
-        SELECT strftime('%Y-%m-%d', timestamp) AS log_time,
-               SUM(((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS whours
-        FROM log
-        where timestamp >=  ? and timestamp < ?
-        GROUP BY strftime('%Y-%m-%d', timestamp)
         """
 
     elif interval == "daily":
