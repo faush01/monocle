@@ -92,7 +92,7 @@ for row in rows:
 
     #print (timestamp + "|" + str(pulse_count) + "|" + str(time_span) + "|" + str(average_pps) + "|" + str(avg_pps) + "|" + str(watts) + "|" + str(watt) + "|" + str(Wh) + "|" + str(whours))
     #print (timestamp + "\t" + str(pulse_count) + "\t" + str(time_span) + "\t" + str(average_pps) + "(" + str(avg_pps) + ")\t" + str(watts) + "(" + str(watt) + ")\t" + str(Wh) + "(" + str(whours) + ")")
-	print ("{0}\t{1}\t{2}\t{3:.3f}\t{4:.3f}\t{5:.3f}".format(timestamp, pulse_count, time_span, average_pps, watts, Wh))
+    print ("{0}\t{1}\t{2}\t{3:.3f}\t{4:.3f}\t{5:.3f}".format(timestamp, pulse_count, time_span, average_pps, watts, Wh))
 
 cur.close()
 conn.close()
