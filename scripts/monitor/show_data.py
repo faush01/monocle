@@ -2,7 +2,17 @@ import time
 import sqlite3
 from datetime import datetime
 from time import mktime
+import sys
+import os.path
 
+db_path = "data.db"
+if len(sys.argv) > 1:
+    db_path = sys.argv[1]
+	
+if not os.path.isfile(db_path):
+    print ("Database file not found : " + db_path)
+    exit(-1)
+	
 # 3200 imp/KwH
 # (3600 / (3200 / 1000)) / seconds = watts
 # time = (3600 / (3200 / 1000)) / watts
@@ -18,11 +28,10 @@ from time import mktime
 #conn.commit()
 #conn.close()
 
-
 conn = sqlite3.connect("data.db", detect_types=sqlite3.PARSE_DECLTYPES)
-
 cur = conn.cursor()
 
+'''
 sql = """
 SELECT strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || "0:00" AS minuet_bucket,
        SUM(((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS whours
@@ -35,7 +44,7 @@ rows = cur.fetchall()
 for row in rows:
 
     print (row)
-
+'''
 
 
 '''
@@ -54,7 +63,6 @@ for row in rows:
 '''
 
 
-'''
 cur.execute("""
 SELECT timestamp,
        pulse_count,
@@ -82,9 +90,9 @@ for row in rows:
     watts = (3600 / (3200 / 1000)) / average_pps
     Wh = ((time_span / 1000000000) / 3600) * watts
 
-    print (timestamp + "|" + str(pulse_count) + "|" + str(time_span) + "|" + str(average_pps) + "|" + str(avg_pps) + "|" + str(watts) + "|" + str(watt) + "|" + str(Wh) + "|" + str(whours))
+    #print (timestamp + "|" + str(pulse_count) + "|" + str(time_span) + "|" + str(average_pps) + "|" + str(avg_pps) + "|" + str(watts) + "|" + str(watt) + "|" + str(Wh) + "|" + str(whours))
     #print (timestamp + "\t" + str(pulse_count) + "\t" + str(time_span) + "\t" + str(average_pps) + "(" + str(avg_pps) + ")\t" + str(watts) + "(" + str(watt) + ")\t" + str(Wh) + "(" + str(whours) + ")")
-'''
+	print ("{0}\t{1}\t{2}\t{3:.3f}\t{4:.3f}\t{5:.3f}".format(timestamp, pulse_count, time_span, average_pps, watts, Wh))
 
 cur.close()
 conn.close()
