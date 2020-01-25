@@ -103,6 +103,8 @@ function process_chart_data(data) {
         }
     }
 
+	colour_fg_data = [];
+	colour_bg_data = [];
     for (i = 0; i < data.length; i++) {
 
         var red = (data[i][1] / max_val) * 255;
