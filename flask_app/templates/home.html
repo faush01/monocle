@@ -4,6 +4,7 @@
     <title>
     Flask Power Monitor
     </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 </head>
 
@@ -54,6 +55,8 @@
 <canvas id="chart_canvas" width="1024" height="500" ></canvas>
 
 <script>
+
+var time_format = "YYYY/MM/DDTHH:mm:ss";
 
 function clearStartTime() {
     var start_date = document.getElementById("start_date");
@@ -139,6 +142,17 @@ function draw_chart() {
         options: {
             responsive:false,
             scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        parser: time_format,
+                        tooltipFormat: 'HH:mm:ss - ll'
+                    },
+                    scaleLabel : {
+                        display: true,
+						labelString: 'Date'
+                    }
+                }],
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
