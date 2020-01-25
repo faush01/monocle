@@ -28,7 +28,7 @@ if not os.path.isfile(db_path):
 #conn.commit()
 #conn.close()
 
-conn = sqlite3.connect("data.db", detect_types=sqlite3.PARSE_DECLTYPES)
+conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
 cur = conn.cursor()
 
 '''
