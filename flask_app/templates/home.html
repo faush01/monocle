@@ -1,0 +1,175 @@
+<html>
+
+<head>
+    <title>
+    Flask Power Monitor
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+
+<body>
+
+<p>
+    <strong>Time : </strong>{{ data.server_time }}</br>
+</p>
+
+<table>
+    <tr>
+        <td>Interval</td>
+        <td>
+            <select id="time_interval">
+                <option value="1min" selected>1 Minute</option>
+                <option value="10min" selected>10 Minutes</option>
+                <option value="30min">30 Minutes</option>
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+                <option value="week">Weekly</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Span</td>
+        <td>
+            <select id="time_span">
+                <option value="60">1 Hour</option>
+                <option value="180" selected>3 Hours</option>
+                <option value="1440">1 Day</option>
+                <option value="10080">1 Week</option>
+                <option value="40320">4 Weeks</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Start</td>
+        <td>
+            <input type="date" id="start_date"> <input type="time" id="start_time"> <button onclick="clearStartTime();">X</button>
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><button onClick="trigger_refresh();">Refresh</button></td>
+    </tr>
+</table>
+
+</br>
+
+<canvas id="chart_canvas" width="1024" height="500" ></canvas>
+
+<script>
+
+function clearStartTime() {
+    var start_date = document.getElementById("start_date");
+    start_date.value = "";
+    var start_time = document.getElementById("start_time");
+    start_time.value = "";
+}
+
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                callback(xhr.response);
+            }
+            else {
+                console.log("Error loading data (" + xhr.status + ") from : " + url)
+            }
+        }
+        else {
+            return false;
+        }
+    };
+    xhr.send();
+};
+
+var label_data = [];
+var value_data = [];
+var colour_fg_data = [];
+var colour_bg_data = [];
+var max_val = 0;
+
+function process_chart_data(data) {
+    label_data = [];
+    value_data = [];
+    for (i = 0; i < data.length; i++) {
+        // console.log(data[i]);
+        label_data.push(data[i][0]);
+        value_data.push(data[i][1]);
+
+        if (data[i][1] > max_val) {
+            max_val = data[i][1];
+        }
+    }
+
+    for (i = 0; i < data.length; i++) {
+
+        var red = (data[i][1] / max_val) * 255;
+        var green = 255 - red;
+        colour_bg_data.push("rgba(" + red + ", " + green + ", 86, 0.2)");
+        colour_fg_data.push("rgba(" + red + ", " + green + ", 86, 1)");
+    }
+
+    draw_chart();
+}
+
+var bar_chart = null;
+
+function draw_chart() {
+
+    if (bar_chart != null) {
+        bar_chart.destroy();
+    }
+
+    var ctx = document.getElementById('chart_canvas').getContext('2d');
+    bar_chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: label_data,
+            datasets: [{
+                label: '# kWh',
+                data: value_data,
+                backgroundColor: colour_bg_data,
+                borderColor: colour_fg_data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive:false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function trigger_refresh() {
+
+    var time_interval_select = document.getElementById("time_interval");
+    var time_interval = time_interval_select.options[time_interval_select.selectedIndex].value;
+
+    var time_span_select = document.getElementById("time_span");
+    var time_span = time_span_select.options[time_span_select.selectedIndex].value;
+
+    var start_date = document.getElementById("start_date");
+    var start_time = document.getElementById("start_time");
+    var start_at = start_date.value + "T" + start_time.value
+
+    var data_url = "/get_history_data?interval=" + time_interval + "&span=" + time_span + "&start=" + start_at + "&timestamp=" + new Date().getTime();
+    console.log(data_url);
+    getJSON(data_url, process_chart_data);
+}
+
+trigger_refresh();
+
+</script>
+
+
+</body>
+
+</html>
