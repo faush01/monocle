@@ -1,21 +1,49 @@
 from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_sockets import Sockets
 from datetime import datetime, timedelta
 import sqlite3
 import os
 import sys
 import os.path
+#from time import sleep
+import gevent
 
 app = Flask(__name__)
+
+app = Flask(__name__)
+sockets = Sockets(app)
 
 db_path = "data.db"
 if len(sys.argv) > 1:
     db_path = sys.argv[1]
-	
+
 if not os.path.isfile(db_path):
     print ("Database file not found : " + db_path)
     exit(-1)
-	
-	
+
+data_count = 0
+@sockets.route('/echo')
+def echo_socket(ws):
+
+    while not ws.closed:
+
+        try:
+            global data_count
+            data = "New Data Available : " + str(data_count)
+            data_count += 1
+            ws.send(data)
+            print (data)
+        except Exception as err:
+            print (str(err))
+
+        gevent.sleep(30.0)
+
+        '''
+        message = ws.receive()
+        print (str(message))
+        ws.send(message)
+        '''
+
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'fav.png', mimetype='image/png')
@@ -158,4 +186,10 @@ def get_history_data():
     return jsonify(data_set)
 
 
-app.run(host='0.0.0.0', port=5000, debug=False)
+# app.run(host='0.0.0.0', port=5000, debug=False)
+
+if __name__ == "__main__":
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    server.serve_forever()
