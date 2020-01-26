@@ -14,6 +14,10 @@
     <strong>Time : </strong>{{ data.server_time }}</br>
 </p>
 
+<p>
+    <strong>Current Usage : </strong><span id="current_usage">current</span> <button onclick="refresh_current_info();">?</button>
+</p>
+
 <table>
     <tr>
         <td>Interval</td>
@@ -181,7 +185,22 @@ function trigger_refresh() {
     getJSON(data_url, process_chart_data);
 }
 
+function display_current_info(data) {
+
+    var cui = document.getElementById('current_usage');
+    cui.innerHTML = data.watts + " (" + data.age + ")";
+
+}
+
+function refresh_current_info() {
+
+    var data_url = "/get_current_data?timestamp=" + new Date().getTime();
+    console.log(data_url);
+    getJSON(data_url, display_current_info);
+}
+
 trigger_refresh();
+refresh_current_info();
 
 </script>
 

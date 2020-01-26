@@ -28,8 +28,44 @@ def home():
     return render_template('home.html', data=data)
 
 
+@app.route("/get_current_data")
+def get_current_data():
+
+    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+    cur = conn.cursor()
+
+    sql = """
+    SELECT timestamp,
+           --pulse_count,
+           --time_span,
+           --((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS avg_pps,
+           (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS watts
+           --((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS whours
+    FROM log 
+    ORDER BY timestamp DESC
+    LIMIT 1
+    """
+    cur.execute(sql)
+    rows = cur.fetchall()
+
+    current_usage = {}
+    if len(rows) == 1:
+        age = datetime.now() - rows[0][0]
+        are_bits = str(age).split(".")
+        current_usage["age"] = are_bits[0]
+        current_usage["watts"] = round(rows[0][1], 2)
+    else:
+        current_usage["age"] = "-"
+        current_usage["watts"] = "-"
+
+    cur.close()
+    conn.close()
+
+    return jsonify(current_usage)
+
+
 @app.route("/get_history_data")
-def get_data():
+def get_history_data():
 
     conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
     cur = conn.cursor()
@@ -64,8 +100,8 @@ def get_data():
         start_timestamp = datetime.now() - timedelta(minutes=span_minutes)
         end_timestamp = datetime.now()
 
-    print (str(start_timestamp))
-    print(str(end_timestamp))
+    #print (str(start_timestamp))
+    #print(str(end_timestamp))
 
     if interval == "1min":
         sql = """
