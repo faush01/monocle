@@ -4,6 +4,8 @@ import time
 import sqlite3
 from datetime import datetime
 from time import mktime
+import requests
+from threading import Thread
 
 # 3200 imp/KwH
 # (3600 / (3200 / 1000)) / seconds = watts
@@ -11,21 +13,38 @@ from time import mktime
 # (3600 / (3200 / 1000)) / 5500 = 
 
 
+def call_notify_thread():
+    r = requests.get("http://localhost:5000/new_data_available")
+    print ("New Data Notification Request : " + r.text)
+
+
 def log_data(time_stamp, pulse_count, time_span):
 
     print ("Log Data Point")
 
-    sql = "INSERT INTO log('timestamp', 'pulse_count', 'time_span') VALUES (?, ?, ?)"
-    conn = sqlite3.connect("data.db")
-    conn.execute(sql, (datetime.fromtimestamp(mktime(time.localtime(time_stamp/1000000000))), pulse_count, time_span))
-    conn.commit()
-    conn.close()
+    try:
+        sql = "INSERT INTO log('timestamp', 'pulse_count', 'time_span') VALUES (?, ?, ?)"
+        conn = sqlite3.connect("data.db")
+        conn.execute(sql, (datetime.fromtimestamp(mktime(time.localtime(time_stamp/1000000000))), pulse_count, time_span))
+        conn.commit()
+        conn.close()
+    except Exception as err:
+        print (str(err))
 
-    file_name_stamp = time_stamp / 1000000000 # to seconds
-    file_name_stamp = time.localtime(file_name_stamp)
-    file_name = "log_files/" + time.strftime('%Y-%m-%d', file_name_stamp) + ".log"
-    with open(file_name, "a") as myfile:
-        myfile.write(str(time_stamp) + "\t" + str(pulse_count) + "\t" + str(time_span) + "\r\n")
+    try:
+        file_name_stamp = time_stamp / 1000000000 # to seconds
+        file_name_stamp = time.localtime(file_name_stamp)
+        file_name = "log_files/" + time.strftime('%Y-%m-%d', file_name_stamp) + ".log"
+        with open(file_name, "a") as myfile:
+            myfile.write(str(time_stamp) + "\t" + str(pulse_count) + "\t" + str(time_span) + "\r\n")
+    except Exception as err:
+        print (str(err))
+
+    try:
+        t = Thread(target=call_notify_thread)
+        t.start()
+    except Exception as err:
+        print(str(err))
 
 
 log_interval = 1000000000 * 60 # 60 seconds
