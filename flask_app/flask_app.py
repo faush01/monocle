@@ -1,11 +1,11 @@
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_sockets import Sockets
 from datetime import datetime, timedelta
+import time
 import sqlite3
 import os
 import sys
 import os.path
-#from time import sleep
 import gevent
 
 app = Flask(__name__)
@@ -21,28 +21,39 @@ if not os.path.isfile(db_path):
     print ("Database file not found : " + db_path)
     exit(-1)
 
+last_data_trigger = 0
+new_data_timestamp = 0
 data_count = 0
+
 @sockets.route('/echo')
 def echo_socket(ws):
 
     while not ws.closed:
 
-        try:
-            global data_count
+        global last_data_trigger
+        global data_count
+        if last_data_trigger != new_data_timestamp:
+            last_data_trigger = new_data_timestamp
             data = "New Data Available : " + str(data_count)
             data_count += 1
             ws.send(data)
             print (data)
-        except Exception as err:
-            print (str(err))
 
-        gevent.sleep(30.0)
+        gevent.sleep(1)
 
         '''
         message = ws.receive()
         print (str(message))
         ws.send(message)
         '''
+
+
+@app.route("/new_data_available")
+def new_data_available():
+    global new_data_timestamp
+    new_data_timestamp = time.time()
+    return str(new_data_timestamp)
+
 
 @app.route("/favicon.ico")
 def favicon():
