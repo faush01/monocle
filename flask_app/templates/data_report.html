@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>Data Report</title>
+</head>
+<body>
+
+<h3>Data Report</h3>
+
+<table border="1" cellpadding="2">
+
+    <thead>
+    <tr>
+        <td>Date</td>
+        <td>Points</td>
+        <td>Pulses</td>
+        <td>DayDiff</td>
+        <td>MinSpan</td>
+        <td>MaxSpan</td>
+    </tr>
+    </thead>
+
+    <tbody>
+      {% for row in data %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.data_count }}</td>
+            <td>{{ row.pulses }}</td>
+            <td>{{ (row.total_time / 1000000000.0) - (60 * 60 * 24)}}</td>
+            <td>{{ row.min_span / 1000000000.0 }}</td>
+            <td>{{ row.max_span / 1000000000.0 }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+
+
+</table>
+
+
+</body>
+</html>

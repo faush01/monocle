@@ -197,6 +197,45 @@ def get_history_data():
     return jsonify(data_set)
 
 
+@app.route("/data_report")
+def data_report():
+
+    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+    cur = conn.cursor()
+
+    sql = """
+    select
+        strftime('%Y-%m-%d', timestamp) as day,
+        count(1) AS data_count,
+        sum(pulse_count) as pulses,
+        sum(time_span) as total_time,
+        min(time_span) as min_span,
+        max(time_span) as max_span
+    from log
+    group by day
+    order by day asc
+    """
+
+    cur.execute(sql)
+    rows = cur.fetchall()
+
+    data_set = []
+    for row in rows:
+        data = {}
+        data["date"] = row[0]
+        data["data_count"] = row[1]
+        data["pulses"] = row[2]
+        data["total_time"] = row[3]
+        data["min_span"] = row[4]
+        data["max_span"] = row[5]
+        data_set.append(data)
+
+    cur.close()
+    conn.close()
+
+    return render_template('data_report.html', data=data_set)
+
+
 # app.run(host='0.0.0.0', port=5000, debug=False)
 
 if __name__ == "__main__":
