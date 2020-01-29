@@ -130,6 +130,9 @@ function draw_chart() {
         bar_chart.destroy();
     }
 
+    //var unit_size = "hour";
+    var unit_size = "day";
+
     var ctx = document.getElementById('chart_canvas').getContext('2d');
     bar_chart = new Chart(ctx, {
         type: 'bar',
@@ -150,7 +153,7 @@ function draw_chart() {
                     type: 'time',
                     time: {
                         parser: time_format,
-                        unit: 'hour',
+                        unit: unit_size,
                         tooltipFormat: 'HH:mm:ss - ll'
                     },
                     scaleLabel : {
