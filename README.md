@@ -1,29 +1,33 @@
 **Setup Raspbian**
 
-https://www.raspberrypi.org/downloads/raspbian/
+`https://www.raspberrypi.org/downloads/raspbian/`
 
-set hostname, password, timezone
+**Update**
 
-sudo nano /etc/hostname
+- `sudo apt-get update`
+- `sudo apt full-upgrade`
 
-sudo nano /etc/hosts
+**Set hostname, password, timezone**
 
-sudo passwd pi
+- `sudo nano /etc/hostname`
+- `sudo nano /etc/hosts`
+- `sudo passwd pi`
+- `sudo raspi-config`
 
-sudo raspi-config
+**Installing Libs**
 
-**Installing Flask**
+- `sudo apt-get install rpi.gpio`
+- `sudo apt-get install git`
+- `sudo apt-get install python3-pip`
+- `sudo pip3 install flask`
+- `sudo pip3 install gevent`
+- `sudo pip3 install Flask-Sockets`
 
-sudo apt-get install git
 
-sudo apt-get install python3-pip
+**Git Clone**
 
-sudo pip3 install flask
-
-sudo pip3 install gevent
-
-sudo pip3 install Flask-Sockets
+`git clone https://github.com/faush01/monocle.git`
 
 **Running**
 
-python3 flask_app.py <path to DB>
+`python3 flask_app.py <path to DB>`
