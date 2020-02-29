@@ -50,12 +50,14 @@ def log_data(time_stamp, pulse_count, time_span):
 log_interval = 1000000000 * 60 # 60 seconds
 count = 1
 last_log_stamp = -1
+gpio_input_pin = 7
+
 
 def button_callback(channel):
     global count
     global last_log_stamp
 
-    pinval = GPIO.input(10)
+    pinval = GPIO.input(gpio_input_pin)
     if pinval == 1:
         return
 
@@ -94,9 +96,9 @@ conn.commit()
 conn.close()
 
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(gpio_input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.add_event_detect(10, GPIO.RISING, callback=button_callback)
+GPIO.add_event_detect(gpio_input_pin, GPIO.RISING, callback=button_callback)
 #, bouncetime=20)
 
 message = input("Press enter to quit\n\n")

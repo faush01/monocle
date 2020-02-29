@@ -7,14 +7,14 @@ import datetime
 # time = (3600 / (3200 / 1000)) / watts
 # (3600 / (3200 / 1000)) / 5500 = 
 
-
+gpio_input_pin = 7
 count = 1
 now = datetime.datetime.now()
 
 def button_callback(channel):
     global count
 
-    pinval = GPIO.input(10)
+    pinval = GPIO.input(gpio_input_pin)
     if pinval == 1:
         return
 
@@ -23,9 +23,9 @@ def button_callback(channel):
 
 
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(gpio_input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.add_event_detect(10, GPIO.RISING, callback=button_callback)
+GPIO.add_event_detect(gpio_input_pin, GPIO.RISING, callback=button_callback)
 #, bouncetime=20)
 
 message = input("Press enter to quit\n\n")
