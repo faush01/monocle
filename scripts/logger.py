@@ -57,7 +57,7 @@ def button_callback(channel):
     global count
     global last_log_stamp
 
-    pinval = GPIO.input(gpio_input_pin)
+    pinval = GPIO.input(channel)
     if pinval == 1:
         return
 
@@ -96,10 +96,8 @@ conn.commit()
 conn.close()
 
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(gpio_input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-GPIO.add_event_detect(gpio_input_pin, GPIO.RISING, callback=button_callback)
-#, bouncetime=20)
+GPIO.setup(gpio_input_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.add_event_detect(gpio_input_pin, GPIO.FALLING, callback=button_callback, bouncetime=20)
 
 message = input("Press enter to quit\n\n")
 GPIO.cleanup()
