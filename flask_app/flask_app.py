@@ -67,6 +67,30 @@ def home():
     return render_template('home.html', data=data)
 
 
+@app.route("/get_max_value")
+def get_max_value():
+
+    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+    cur = conn.cursor()
+
+    sql = """
+    SELECT MAX((3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS max_value
+    FROM log
+    """
+    cur.execute(sql)
+    rows = cur.fetchone()
+
+    max_values = {}
+    if rows:
+        max_values["max_value"] = int(rows[0]) + 1
+    else:
+        max_values["max_value"] = 1
+
+    cur.close()
+    conn.close()
+    return jsonify(max_values)
+
+
 @app.route("/get_current_data")
 def get_current_data():
 
