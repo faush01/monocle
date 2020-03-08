@@ -92,10 +92,14 @@ def get_current_data():
         age = datetime.now() - rows[0][0]
         are_bits = str(age).split(".")
         current_usage["age"] = are_bits[0]
+        current_usage["age_seconds"] = age.total_seconds()
         current_usage["watts"] = round(rows[0][1], 2)
+        current_usage["time"] = str(datetime.now())
     else:
         current_usage["age"] = "-"
+        current_usage["age_seconds"] = "-"
         current_usage["watts"] = "-"
+        current_usage["time"] = str(datetime.now())
 
     cur.close()
     conn.close()
@@ -142,44 +146,23 @@ def get_history_data():
     #print (str(start_timestamp))
     #print(str(end_timestamp))
 
+    query_time_string = ""
     if interval == "1min":
-        sql = """
-        SELECT strftime('%Y-%m-%dT%H:%M:%S', timestamp) AS log_time,
-               --pulse_count,
-               --time_span,
-               --((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS avg_pps,
-               --(3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS watts,
-               ((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS whours
-        FROM log 
-        where timestamp >=  ? and timestamp < ?
-        """
-
+        query_time_string = "strftime('%Y-%m-%dT%H:%M:%S', timestamp)"
     elif interval == "10min":
-        sql = """
-        SELECT strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || "0:00" AS minuet_bucket,
-               SUM(((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS whours
-        FROM log
-        where timestamp >=  ? and timestamp < ?
-        GROUP BY strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || "0:00"
-        """
-
+        query_time_string = "strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || '0:00'"
     elif interval == "hourly":
-        sql = """
-        SELECT strftime('%Y-%m-%dT%H:00:00', timestamp) AS log_time,
-               SUM(((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS whours
-        FROM log
-        where timestamp >=  ? and timestamp < ?
-        GROUP BY strftime('%Y-%m-%dT%H:00:00', timestamp)
-        """
-
+        query_time_string = "strftime('%Y-%m-%dT%H:00:00', timestamp)"
     elif interval == "daily":
-        sql = """
-        SELECT strftime('%Y-%m-%d', timestamp) AS log_time,
-               SUM(((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000)) AS whours
-        FROM log
-        where timestamp >=  ? and timestamp < ?
-        GROUP BY strftime('%Y-%m-%d', timestamp)
-        """
+        query_time_string = "strftime('%Y-%m-%d', timestamp)"
+
+    sql = ""
+    sql += "SELECT " + query_time_string + " AS timestamp, "
+    sql += "(3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours "
+    sql += "FROM log "
+    sql += "where timestamp >=  ? and timestamp < ? "
+    sql += "GROUP BY " + query_time_string + " "
+    sql += "ORDER BY " + query_time_string + " ASC"
 
     cur.execute(sql, (start_timestamp,end_timestamp,))
     rows = cur.fetchall()
@@ -188,7 +171,7 @@ def get_history_data():
     for row in rows:
         row_data = []
         row_data.append(row[0])
-        row_data.append(row[1])
+        row_data.append(round(row[1], 2))
         data_set.append(row_data)
 
     cur.close()

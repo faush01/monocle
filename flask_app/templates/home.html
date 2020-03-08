@@ -11,11 +11,11 @@
 <body>
 
 <p>
-    <strong>Time : </strong>{{ data.server_time }}</br>
+    <strong>Time : </strong><span id="current_time">time</span>
 </p>
 
 <p>
-    <strong>Current Usage : </strong><span id="current_usage">current</span> <button onclick="refresh_current_info();">?</button>
+    <strong>Current : </strong><span id="current_usage">current</span>
 </p>
 
 <table>
@@ -23,7 +23,7 @@
         <td>Interval</td>
         <td>
             <select id="time_interval">
-                <option value="1min" selected>1 Minute</option>
+                <option value="1min">1 Minute</option>
                 <option value="10min" selected>10 Minutes</option>
                 <option value="hourly">Hourly</option>
                 <option value="daily">Daily</option>
@@ -36,9 +36,14 @@
             <select id="time_span">
                 <option value="60">1 Hour</option>
                 <option value="180" selected>3 Hours</option>
+                <option value="360">6 Hours</option>
+                <option value="720">12 Hours</option>
                 <option value="1440">1 Day</option>
                 <option value="10080">1 Week</option>
                 <option value="40320">4 Weeks</option>
+                <option value="120960">12 Weeks</option>
+                <option value="262080">26 Weeks</option>
+                <option value="524160">52 Weeks</option>
             </select>
         </td>
     </tr>
@@ -50,11 +55,11 @@
     </tr>
     <tr>
         <td>&nbsp;</td>
-        <td><button onClick="trigger_refresh();">Refresh</button></td>
+        <td><button onClick="trigger_refresh();refresh_current_info();">Refresh</button></td>
     </tr>
 </table>
 
-</br>
+<br/>
 
 <canvas id="chart_canvas" width="1024" height="500" ></canvas>
 
@@ -94,6 +99,8 @@ var value_data = [];
 var colour_fg_data = [];
 var colour_bg_data = [];
 var max_val = 0;
+var unit_size = "day";
+var chart_interval = "";
 
 function process_chart_data(data) {
     label_data = [];
@@ -122,6 +129,79 @@ function process_chart_data(data) {
     draw_chart();
 }
 
+Date.prototype.yyyymmdd = function() {
+  var mm = this.getMonth() + 1;
+  var dd = this.getDate();
+
+  return [this.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd
+         ].join('-');
+};
+
+Date.prototype.hhmmss = function() {
+  var hh = this.getHours();
+  var mm = this.getMinutes();
+
+  return [(hh>9 ? '' : '0') + hh,
+          (mm>9 ? '' : '0') + mm,
+          "00"
+         ].join(':');
+};
+
+function chart_click(evt, items) {
+    if (items.length == 1) {
+
+        var date_stamp = items[0]['_model'].label;
+        var new_start = new Date(date_stamp);
+
+        var start_date = document.getElementById("start_date");
+        var start_time = document.getElementById("start_time");
+        var time_interval_select = document.getElementById("time_interval");
+        var time_span_select = document.getElementById("time_span");
+
+        if (chart_interval === "daily") {
+            var dateOffset = (60*60*1000) * 72;
+            new_start.setTime(new_start.getTime() - dateOffset);
+            console.log(new_start.yyyymmdd() + " | " + new_start.hhmmss());
+            start_time.value = "";
+            start_date.value = new_start.toISOString().substring(0, 10);
+            time_span_select.value = "10080";
+            time_interval_select.value = "hourly";
+            trigger_refresh();
+        }
+        else if (chart_interval === "hourly") {
+            var dateOffset = (60*60*1000) * 12;
+            new_start.setTime(new_start.getTime() - dateOffset);
+            console.log(new_start.yyyymmdd() + " | " + new_start.hhmmss());
+            start_time.value = new_start.hhmmss();
+            start_date.value = new_start.yyyymmdd();
+            time_span_select.value = "1440";
+            time_interval_select.value = "10min";
+        }
+        else if (chart_interval === "10min") {
+            var dateOffset = (60*60*1000) * 1.5;
+            new_start.setTime(new_start.getTime() - dateOffset);
+            console.log(new_start.yyyymmdd() + " | " + new_start.hhmmss());
+            start_time.value = new_start.hhmmss();
+            start_date.value = new_start.yyyymmdd();
+            time_span_select.value = "180";
+            time_interval_select.value = "1min";
+        }
+        else if (chart_interval === "1min") {
+            var dateOffset = (60*60*1000) * 1.5;
+            new_start.setTime(new_start.getTime() - dateOffset);
+            console.log(new_start.yyyymmdd() + " | " + new_start.hhmmss());
+            start_time.value = new_start.hhmmss();
+            start_date.value = new_start.yyyymmdd();
+            time_span_select.value = "180";
+            time_interval_select.value = "1min";
+        }
+
+        trigger_refresh();
+    }
+}
+
 var bar_chart = null;
 
 function draw_chart() {
@@ -130,16 +210,13 @@ function draw_chart() {
         bar_chart.destroy();
     }
 
-    //var unit_size = "hour";
-    var unit_size = "day";
-
     var ctx = document.getElementById('chart_canvas').getContext('2d');
     bar_chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: label_data,
             datasets: [{
-                label: '# Wh',
+                label: '# kWh',
                 data: value_data,
                 backgroundColor: colour_bg_data,
                 borderColor: colour_fg_data,
@@ -147,6 +224,8 @@ function draw_chart() {
             }]
         },
         options: {
+            //events: ['click'],
+            onClick: chart_click,
             responsive:false,
             scales: {
                 xAxes: [{
@@ -181,7 +260,27 @@ function trigger_refresh() {
 
     var start_date = document.getElementById("start_date");
     var start_time = document.getElementById("start_time");
-    var start_at = start_date.value + "T" + start_time.value
+    var start_at = start_date.value + "T" + start_time.value;
+
+    chart_interval = time_interval;
+
+    if (time_interval == "1min") {
+        unit_size = "minute";
+    }
+    else if (time_interval == "10min") {
+        unit_size = "hour";
+    }
+    else if (time_interval == "hourly") {
+        unit_size = "hour";
+    }
+    else if (time_interval == "daily") {
+        unit_size = "day";
+    }
+    else {
+        unit_size = "day";
+    }
+
+    //console.log("Unit Size : " + unit_size);
 
     var data_url = "/get_history_data?interval=" + time_interval + "&span=" + time_span + "&start=" + start_at + "&timestamp=" + new Date().getTime();
     console.log(data_url);
@@ -191,8 +290,14 @@ function trigger_refresh() {
 function display_current_info(data) {
 
     var cui = document.getElementById('current_usage');
-    cui.innerHTML = data.watts + " (" + data.age + ")";
+    var current_usage = data.watts + " kWh";
+    if (data.age_seconds > 65) {
+        current_usage += " (" + data.age + ")";
+    }
+    cui.innerHTML = current_usage;
 
+    var current_time = document.getElementById('current_time');
+    current_time.innerHTML = data.time;
 }
 
 function refresh_current_info() {
