@@ -32,3 +32,22 @@
 **Running**
 
 `python3 flask_app.py <path to DB>`
+
+**Headless Wifi on the Pi**
+
+wpa_supplicant.conf
+```
+country=US
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="NETWORK-NAME"
+    psk="NETWORK-PASSWORD"
+}
+```
+Enable SSH
+Create empty file /Volumes/boot/ssh
+
+
+
