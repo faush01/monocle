@@ -122,7 +122,7 @@ function process_chart_data(data) {
 	colour_bg_data = [];
     for (i = 0; i < data.length; i++) {
 
-        var red = (data[i][1] / max_chart_value) * 255;
+        var red = (data[i][1] / max_val) * 255;
         var green = 255 - red;
         colour_bg_data.push("rgba(" + red + ", " + green + ", 86, 0.2)");
         colour_fg_data.push("rgba(" + red + ", " + green + ", 86, 1)");
@@ -244,8 +244,8 @@ function draw_chart() {
                 }],
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true,
-                        max: max_chart_value
+                        beginAtZero: true
+                        //max: max_chart_value
                     }
                 }]
             }
@@ -325,7 +325,9 @@ function get_max_value() {
     getJSON(data_url, set_max_value);
 }
 
-get_max_value();
+//get_max_value();
+refresh_current_info();
+trigger_refresh();
 
 var ws = new WebSocket("ws://" + location.host + "/echo");
 //ws.onopen = function (event) {

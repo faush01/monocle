@@ -172,21 +172,52 @@ def get_history_data():
 
     query_time_string = ""
     if interval == "1min":
-        query_time_string = "strftime('%Y-%m-%dT%H:%M:%S', timestamp)"
+        sql = """
+            SELECT 
+                strftime('%Y-%m-%dT%H:%M:%S', timestamp) AS timestamp_string, 
+                (3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours 
+            FROM log 
+            where timestamp >=  ? and timestamp < ? 
+            GROUP BY timestamp_string 
+            ORDER BY timestamp_string ASC
+        """
     elif interval == "10min":
-        query_time_string = "strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || '0:00'"
+        sql = """
+            SELECT 
+                strftime('%Y-%m-%dT%H:', timestamp) || CAST((CAST(strftime('%M', timestamp) AS INT) / 10) AS TEXT) || '0:00' AS timestamp_string, 
+                (3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours 
+            FROM log 
+            where timestamp >=  ? and timestamp < ? 
+            GROUP BY timestamp_string 
+            ORDER BY timestamp_string ASC
+        """
     elif interval == "hourly":
-        query_time_string = "strftime('%Y-%m-%dT%H:00:00', timestamp)"
+        sql = """
+            SELECT 
+                strftime('%Y-%m-%dT%H:00:00', timestamp) AS timestamp_string, 
+                (3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours 
+            FROM log 
+            where timestamp >=  ? and timestamp < ? 
+            GROUP BY timestamp_string 
+            ORDER BY timestamp_string ASC
+        """
     elif interval == "daily":
-        query_time_string = "strftime('%Y-%m-%d', timestamp)"
-
-    sql = ""
-    sql += "SELECT " + query_time_string + " AS timestamp, "
-    sql += "(3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours "
-    sql += "FROM log "
-    sql += "where timestamp >=  ? and timestamp < ? "
-    sql += "GROUP BY " + query_time_string + " "
-    sql += "ORDER BY " + query_time_string + " ASC"
+        sql = """
+            SELECT
+               timestamp_day AS timestamp_string,
+               SUM(whours) AS whours
+            FROM (
+            SELECT
+               strftime('%Y-%m-%d', timestamp) AS timestamp_day,
+               strftime('%Y-%m-%d-%H', timestamp) AS timestamp_hour,
+               (3600.0 / (3200.0 / 1000.0)) / ((CAST(SUM(time_span) AS FLOAT) / SUM(pulse_count)) / 1000000000) AS whours
+            FROM log
+            where timestamp >=  ? and timestamp < ? 
+            GROUP BY timestamp_hour
+            )
+            GROUP BY timestamp_day
+            ORDER BY timestamp_day ASC
+        """
 
     cur.execute(sql, (start_timestamp,end_timestamp,))
     rows = cur.fetchall()

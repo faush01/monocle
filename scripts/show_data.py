@@ -62,7 +62,7 @@ SELECT timestamp,
        ((CAST(time_span AS FLOAT) / 1000000000.0) / 3600.0) * (3600.0 / (3200.0 / 1000.0)) / ((CAST(time_span AS FLOAT) / pulse_count) / 1000000000) AS whours
 FROM log 
 where timestamp > ?
-""", (datetime(2020,3,07,18,00,00),))
+""", (datetime(2020,3,7,18,0,0),))
 
 '''
 cur.execute("""
