@@ -54,6 +54,12 @@
         </td>
     </tr>
     <tr>
+        <td>Price</td>
+        <td>
+            <input type="text" id="price_per_kw" value="0.254701" /> <input type="checkbox" id="show_price" />
+        </td>
+    </tr>
+    <tr>
         <td>&nbsp;</td>
         <td><button onClick="trigger_refresh();refresh_current_info();">Refresh</button></td>
     </tr>
@@ -108,10 +114,18 @@ function process_chart_data(data) {
     value_data = [];
 	max_val = 0;
 
+	var show_price = document.getElementById("show_price").checked;
+	var price_per_kw = document.getElementById("price_per_kw").value;
+
     for (i = 0; i < data.length; i++) {
         // console.log(data[i]);
         label_data.push(data[i][0]);
-        value_data.push(data[i][1]);
+
+        var actual_data = data[i][1];
+        if (show_price) {
+            actual_data =  (actual_data / 1000) * price_per_kw;
+        }
+        value_data.push(actual_data);
 
         if (data[i][1] > max_val) {
             max_val = data[i][1];
@@ -212,13 +226,19 @@ function draw_chart() {
         bar_chart.destroy();
     }
 
+    var show_price = document.getElementById("show_price").checked;
+    var label = "# Wh";
+    if (show_price) {
+        label = "$";
+    }
+
     var ctx = document.getElementById('chart_canvas').getContext('2d');
     bar_chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: label_data,
             datasets: [{
-                label: '# kWh',
+                label: label,
                 data: value_data,
                 backgroundColor: colour_bg_data,
                 borderColor: colour_fg_data,
@@ -293,7 +313,15 @@ function trigger_refresh() {
 function display_current_info(data) {
 
     var cui = document.getElementById('current_usage');
-    var current_usage = data.watts + " kWh";
+	var show_price = document.getElementById("show_price").checked;
+	var price_per_kw = document.getElementById("price_per_kw").value;
+
+    var current_usage = data.watts + " Wh";
+
+    if (show_price) {
+        current_usage = ((data.watts / 1000) * price_per_kw) + " $";
+    }
+
     if (data.age_seconds > 65) {
         current_usage += " (" + data.age + ")";
     }
