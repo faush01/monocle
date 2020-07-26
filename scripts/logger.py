@@ -13,15 +13,23 @@ from threading import Thread
 # (3600 / (3200 / 1000)) / 5500 = 
 
 
-def call_notify_thread():
-    r = requests.get("http://localhost:5000/new_data_available")
-    print ("New Data Notification Request : " + r.text)
+def call_notify_thread(event_date, ws):
+    request_data = {
+        "table": "power_usage",
+        "event_date": event_date,
+        "event_type": "ws",
+        "event_data": ws
+    }
+    print ("Sending Data: " + str(request_data))
+    r = requests.post("http://192.168.0.16:3456", json=request_data)
+    # print ("New Data Notification Request : " + r.text)
 
 
 def log_data(time_stamp, pulse_count, time_span):
 
-    print ("Log Data Point")
+    # print ("Log Data Point")
 
+    '''
     try:
         sql = "INSERT INTO log('timestamp', 'pulse_count', 'time_span') VALUES (?, ?, ?)"
         conn = sqlite3.connect("data.db")
@@ -30,7 +38,9 @@ def log_data(time_stamp, pulse_count, time_span):
         conn.close()
     except Exception as err:
         print (str(err))
+    '''
 
+    '''
     try:
         file_name_stamp = time_stamp / 1000000000 # to seconds
         file_name_stamp = time.localtime(file_name_stamp)
@@ -39,9 +49,14 @@ def log_data(time_stamp, pulse_count, time_span):
             myfile.write(str(time_stamp) + "\t" + str(pulse_count) + "\t" + str(time_span) + "\r\n")
     except Exception as err:
         print (str(err))
+    '''
 
     try:
-        t = Thread(target=call_notify_thread)
+        event_date_seconds = time_stamp / 1000000000 # to seconds
+        file_name_stamp = time.localtime(event_date_seconds)
+        event_date = time.strftime('%Y-%m-%d %H:%M:%S', file_name_stamp)
+        ws = ((9 * int(pulse_count)) / (8 * (int(time_span) / 1000000000))) / 3.6
+        t = Thread(target=call_notify_thread, args=(event_date, ws))
         t.start()
     except Exception as err:
         print(str(err))
