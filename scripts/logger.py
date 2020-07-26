@@ -94,8 +94,8 @@ def button_callback(channel):
     #print("Button was pushed : " + str(count) + " - " + str(time_diff) + " - " + str(datetime.datetime.now()))
 
 
-if not os.path.exists('log_files'):
-    os.makedirs('log_files')
+# if not os.path.exists('log_files'):
+#     os.makedirs('log_files')
 
 initial_setup = """
 CREATE TABLE IF NOT EXISTS log(
@@ -105,10 +105,12 @@ CREATE TABLE IF NOT EXISTS log(
 )
 """
 
+'''
 conn = sqlite3.connect("data.db")
 conn.execute(initial_setup)
 conn.commit()
 conn.close()
+'''
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(gpio_input_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
