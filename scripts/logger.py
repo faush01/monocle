@@ -131,9 +131,9 @@ GPIO.add_event_detect(gpio_input_pin, GPIO.FALLING, callback=button_callback, bo
 while True:
 
     seconds_since_last_update = time.time() - last_pulse_detected
-    print ("Time since last update: %s" % seconds_since_last_update)
+    print (str(datetime.now()) + " - Time since last update: %s" % seconds_since_last_update)
     if seconds_since_last_update > 90:
-        print ("No new data for %s seconds" % seconds_since_last_update)
+        print (str(datetime.now()) + " - No new data for %s seconds" % seconds_since_last_update)
     time.sleep(60)
 
 # message = input("Press enter to quit\n\n")
