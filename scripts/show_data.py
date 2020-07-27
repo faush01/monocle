@@ -14,9 +14,16 @@ if not os.path.isfile(db_path):
     exit(-1)
 	
 # 3200 imp/KwH
-# (3600 / (3200 / 1000)) / seconds = watts
-# time = (3600 / (3200 / 1000)) / watts
-# (3600 / (3200 / 1000)) / 5500 =
+# 3200 pulses in 1 hour = 1 Kw/h
+# 3200 pulses in 3600 seconds = 1 Kw/h
+# 3200 pulses in 3600 seconds = (1000 / 3600) w/s
+
+# (pulses / 3200) * (3600 / seconds) = Kw/h
+# ((pulses / 3200) * (3600 / seconds) * 1000) / 3600 = w/s
+# ((pulses / 3200) * (3600 / seconds)) / 3.6 = w/s
+# 9 * Pulse / 8 * Sec / 3.6 = w/s
+# ((9 * Pulse) / (8 * Sec)) / 3.6 = w/s
+
 
 conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
 cur = conn.cursor()
