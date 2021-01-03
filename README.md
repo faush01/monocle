@@ -33,7 +33,9 @@
 **Running Logger At Startup**
 
 `sudo crontab -e`
+
 Add line
+
 `@reboot stdbuf -o0 python3 -u /home/pi/monocle/scripts/logger.py run > /home/pi/monocle/logger.log 2>&1 & disown`
 
 **Running Flask Web App (Optional)**
