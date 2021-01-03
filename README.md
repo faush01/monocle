@@ -18,18 +18,25 @@
 
 - `sudo apt-get install rpi.gpio`
 - `sudo apt-get install git`
-- `sudo apt-get install screen`
+
+**Only needed if running flask web app (Optional)**
+
 - `sudo apt-get install python3-pip`
 - `sudo pip3 install flask`
 - `sudo pip3 install gevent`
 - `sudo pip3 install Flask-Sockets`
 
-
 **Git Clone**
 
 `git clone https://github.com/faush01/monocle.git`
 
-**Running**
+**Running Logger At Startup**
+
+`sudo crontab -e`
+Add line
+`@reboot stdbuf -o0 python3 -u /home/pi/monocle/scripts/logger.py run > /home/pi/monocle/logger.log 2>&1 & disown`
+
+**Running Flask Web App (Optional)**
 
 `python3 flask_app.py <path to DB>`
 
@@ -37,7 +44,7 @@
 
 wpa_supplicant.conf
 ```
-country=US
+country=AU
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
 
