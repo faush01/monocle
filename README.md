@@ -34,9 +34,12 @@
 
 `sudo crontab -e`
 
-Add line
+Add lines
 
-`@reboot stdbuf -o0 python3 -u /home/pi/monocle/scripts/logger.py run > /home/pi/monocle/logger.log 2>&1 & disown`
+```
+@reboot stdbuf -o0 python3 -u /home/pi/monocle/scripts/logger.py run > /home/pi/monocle/logger.log 2>&1 & disown
+0 2 * * * /sbin/shutdown -r now
+```
 
 **Running Flask Web App (Optional)**
 
