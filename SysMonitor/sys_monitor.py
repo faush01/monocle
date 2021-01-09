@@ -8,7 +8,6 @@ import requests
 import threading
 import http.client
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import cgi
 import json
 
 # https://psutil.readthedocs.io/en/latest/
@@ -58,20 +57,6 @@ class HttpStatsLoggerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         print("HttpStatsLoggerHandlerdo_POST()")
-        json_request = {}
-        
-        '''
-        ctype, pdict = cgi.parse_header(self.headers['Content-Type'])
-        if ctype == 'multipart/form-data':
-            if "CONTENT-LENGTH" not in pdict:
-                pdict["CONTENT-LENGTH"] = self.headers.get('Content-Length')
-            pdict['boundary'] = bytes(pdict['boundary'], 'utf-8')
-            fields = cgi.parse_multipart(self.rfile, pdict)
-            json_request = fields.get('data')[0]
-            print (json_request)
-        else:
-        '''
-
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
         json_string = post_body.decode("utf-8")
@@ -83,7 +68,7 @@ class HttpStatsLoggerHandler(BaseHTTPRequestHandler):
                 (json_request["event_date"], json_request["event_type"], json_request["event_data"])
             ]
             print(event_data)
-            # log_data(json_request["table"], event_data)
+            log_data(json_request["table"], event_data)
         except Exception as err:
             print(err)
 
