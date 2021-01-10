@@ -21,11 +21,8 @@ CREATE TABLE public.events
     data double precision NOT NULL,
     CONSTRAINT events_pkey PRIMARY KEY (data_type, event_date)
 )
-
 TABLESPACE pg_default;
-
-ALTER TABLE public.events
-    OWNER to postgres;
+ALTER TABLE public.events OWNER to postgres;
     
 CREATE TABLE public.power_usage
 (
@@ -34,11 +31,18 @@ CREATE TABLE public.power_usage
     data double precision NOT NULL,
     CONSTRAINT power_usage_pkey PRIMARY KEY (data_type, event_date)
 )
-
 TABLESPACE pg_default;
-
-ALTER TABLE public.power_usage
-    OWNER to postgres;
+ALTER TABLE public.power_usage OWNER to postgres;
+    
+CREATE TABLE public.environment
+(
+    event_date timestamp with time zone NOT NULL,
+    data_type character varying(256) COLLATE pg_catalog."default" NOT NULL,
+    data double precision NOT NULL,
+    CONSTRAINT environment_pkey PRIMARY KEY (data_type, event_date)
+)
+TABLESPACE pg_default;
+ALTER TABLE public.environment OWNER to postgres;    
         
 '''
 
