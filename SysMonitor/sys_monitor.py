@@ -12,41 +12,6 @@ import json
 
 # https://psutil.readthedocs.io/en/latest/
 
-
-'''
-CREATE TABLE public.events
-(
-    event_date timestamp with time zone NOT NULL,
-	data_type character varying(256) COLLATE pg_catalog."default" NOT NULL,
-    data double precision NOT NULL,
-    CONSTRAINT events_pkey PRIMARY KEY (data_type, event_date)
-)
-TABLESPACE pg_default;
-ALTER TABLE public.events OWNER to postgres;
-    
-CREATE TABLE public.power_usage
-(
-    event_date timestamp with time zone NOT NULL,
-    data_type character varying(256) COLLATE pg_catalog."default" NOT NULL,
-    data double precision NOT NULL,
-    CONSTRAINT power_usage_pkey PRIMARY KEY (data_type, event_date)
-)
-TABLESPACE pg_default;
-ALTER TABLE public.power_usage OWNER to postgres;
-    
-CREATE TABLE public.environment
-(
-    event_date timestamp with time zone NOT NULL,
-    data_type character varying(256) COLLATE pg_catalog."default" NOT NULL,
-    data double precision NOT NULL,
-    CONSTRAINT environment_pkey PRIMARY KEY (data_type, event_date)
-)
-TABLESPACE pg_default;
-ALTER TABLE public.environment OWNER to postgres;    
-        
-'''
-
-
 class HttpStatsLoggerHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
@@ -55,24 +20,24 @@ class HttpStatsLoggerHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self):
-        print("HttpStatsLoggerHandler:do_GET()")
+        #print("HttpStatsLoggerHandler:do_GET()")
         self.send_response(200)
         return
 
     def do_POST(self):
-        print("HttpStatsLoggerHandlerdo_POST()")
+        #print("HttpStatsLoggerHandlerdo_POST()")
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
         json_string = post_body.decode("utf-8")
         json_request = json.loads(json_string)
-        print(json_request)
+        #print(json_request)
 
         try:
-            event_data = [
-                (json_request["event_date"], json_request["event_type"], json_request["event_data"])
-            ]
-            print(event_data)
-            log_data(json_request["table"], event_data)
+            for table in json_request:
+                event_data = []
+                for log_item in json_request[table]:
+                    event_data.append((log_item["event_date"], log_item["event_type"], log_item["event_data"]))
+                log_data(table, event_data)
         except Exception as err:
             print(err)
 
@@ -133,13 +98,60 @@ def config(filename='config.ini', section=''):
     return db
 
 
+def create_table(cur, table_name):
+    sql_create = "CREATE TABLE IF NOT EXISTS "
+    sql_create += "public." + table_name + " ("
+    sql_create += "event_date timestamp with time zone NOT NULL, "
+    sql_create += "data_type character varying(256) COLLATE pg_catalog.default NOT NULL, "
+    sql_create += "data double precision NOT NULL, "
+    sql_create += "CONSTRAINT " + table_name + "_pkey PRIMARY KEY (event_date, data_type)"
+    sql_create += ")"
+    print(sql_create)
+    cur.execute(sql_create)
+
+
+retention = config(section="retention")
+last_retention_check = {}
+
+
+def remove_old(cur, table_name):
+    if retention.get(table_name):
+        last_check = last_retention_check.get(table_name)
+        if last_check is None or time.time() - last_check > (60 * 60 * 24):
+            last_retention_check[table_name] = time.time()
+            days = retention[table_name]
+            print(table_name + " retention " + days + " days")
+            sql_delete = "delete from public." + table_name + " where event_date < now() - INTERVAL '" + days + " DAY'"
+            print(sql_delete)
+            cur.execute(sql_delete)
+
+
 def log_data(table, data_set):
+    print(table + " : " + str(len(data_set)))
+    # print(table + " : " + str(data_set))
     params = config(section="postgresql")
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
+
     insert_sql = "INSERT INTO " + table + " (event_date, data_type, data) VALUES (%s, %s, %s)"
-    # insert_all = [(event_date, "cpu", 0.783), (event_date, "ram", 44568)]
-    cur.executemany(insert_sql, data_set)
+    # data_set = [(event_date, "cpu", 0.783), (event_date, "ram", 44568)]
+
+    try:
+        cur.executemany(insert_sql, data_set)
+    except Exception as ex:
+        if "UndefinedTable" == type(ex).__name__:
+            print("Trying to create missing table")
+            cur.close()
+            conn.close()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            create_table(cur, table)
+            cur.executemany(insert_sql, data_set)
+        else:
+            raise
+
+    remove_old(cur, table)
+
     conn.commit()
     cur.close()
     conn.close()
