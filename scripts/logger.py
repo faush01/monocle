@@ -19,20 +19,18 @@ from threading import Thread
 # convert to watts per second
 
 
-def call_notify_thread(event_date, ws):
+def call_notify_thread(event_data):
     try:
-        request_data = {
-            "table": "power_usage",
-            "event_date": event_date,
-            "event_type": "ws",
-            "event_data": ws
-        }
-        # print ("Sending Data: " + str(request_data))
+        request_data = {"power_usage": event_data}
+
+        print("Sending Data: " + str(request_data))
         r = requests.post("http://192.168.0.16:3456", json=request_data)
-        # print ("New Data Notification Request : " + r.text)
+        print("New Data Notification Request : " + r.text)
 
     except Exception as err:
-        print("call_notify_thread - " + event_date + " - " + str(err))
+        print("call_notify_thread")
+        print(event_data)
+        print(str(err))
 
 
 def log_data(time_stamp, pulse_count, time_span):
@@ -66,7 +64,15 @@ def log_data(time_stamp, pulse_count, time_span):
         file_name_stamp = time.localtime(event_date_seconds)
         event_date = time.strftime('%Y-%m-%d %H:%M:%S', file_name_stamp)
         ws = ((9 * int(pulse_count)) / (8 * (int(time_span) / 1000000000))) / 3.6
-        t = Thread(target=call_notify_thread, args=(event_date, ws))
+
+        log_power = {
+            "event_date": event_date,
+            "event_type": "ws",
+            "event_data": ws
+        }
+        log_data = [log_power]
+
+        t = Thread(target=call_notify_thread, args=(log_data))
         t.start()
     except Exception as err:
         print("log_data - " + event_date + " - " + str(err))

@@ -61,5 +61,9 @@ network={
 Enable SSH
 Create empty file /Volumes/boot/ssh
 
+**DHT22 Temperature and Relative Humidity Sensor**
 
+- `sudo apt-get install python3-dev python3-pip`
+- `sudo python3 -m pip install --upgrade pip setuptools wheel`
+- `sudo pip3 install Adafruit_DHT`
 

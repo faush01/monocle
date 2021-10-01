@@ -7,20 +7,18 @@ DHT_SENSOR = Adafruit_DHT.DHT22
 DHT_PIN = 4
 
 
-def send_log_data(event_date, event_data, event_type):
+def send_log_data(event_data):
     try:
-        request_data = {
-            "table": "environment",
-            "event_date": event_date,
-            "event_type": event_type,
-            "event_data": event_data
-        }
-        print ("Sending Data: " + str(request_data))
+        request_data = {"environment": event_data}
+
+        print("Sending Data: " + str(request_data))
         r = requests.post("http://192.168.0.16:3456", json=request_data)
-        print ("New Data Notification Request : " + r.text)
+        print("New Data Notification Request : " + r.text)
 
     except Exception as err:
-        print("call_notify_thread - " + event_date + " - " + str(err))
+        print("call_notify_thread")
+        print(event_data)
+        print(str(err))
 
 
 while True:
@@ -31,8 +29,19 @@ while True:
         print("Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(temperature, humidity))
 
         date_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        send_log_data(date_string, temperature, "t")
-        send_log_data(date_string, humidity, "rh")
+        log_temp = {
+            "event_date": date_string,
+            "event_type": "t",
+            "event_data": temperature
+        }
+        log_hum = {
+            "event_date": date_string,
+            "event_type": "rh",
+            "event_data": humidity
+        }
+        log_data = [log_temp, log_hum]
+
+        send_log_data(log_data)
 
     else:
         print("Failed to retrieve data from humidity sensor")
