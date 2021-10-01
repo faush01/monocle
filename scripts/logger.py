@@ -70,12 +70,12 @@ def log_data(time_stamp, pulse_count, time_span):
             "event_type": "ws",
             "event_data": ws
         }
-        log_data = [log_power]
+        data_to_log = [log_power]
 
-        t = Thread(target=call_notify_thread, args=(log_data))
+        t = Thread(target=call_notify_thread, args=([data_to_log]))
         t.start()
     except Exception as err:
-        print("log_data - " + event_date + " - " + str(err))
+        print("data_to_log - " + str(data_to_log) + " - " + str(err))
 
 
 log_interval = 1000000000 * 60 # 60 seconds
