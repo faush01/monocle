@@ -36,7 +36,7 @@ class HttpStatsLoggerHandler(BaseHTTPRequestHandler):
             for table in json_request:
                 event_data = []
                 for log_item in json_request[table]:
-                    event_data.append((log_item["event_date"], log_item["event_type"], log_item["event_data"]))
+                    event_data.append([log_item["event_date"], log_item["event_type"], log_item["event_data"]])
                 log_data(table, event_data)
         except Exception as err:
             print(err)
@@ -103,7 +103,7 @@ def create_table(cur, table_name):
     sql_create += "public." + table_name + " ("
     sql_create += "event_date timestamp with time zone NOT NULL, "
     sql_create += "data_type character varying(256) COLLATE pg_catalog.default NOT NULL, "
-    sql_create += "data double precision NOT NULL, "
+    sql_create += "data jsonb, "
     sql_create += "CONSTRAINT " + table_name + "_pkey PRIMARY KEY (event_date, data_type)"
     sql_create += ")"
     print(sql_create)
@@ -133,11 +133,17 @@ def log_data(table, data_set):
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
 
+    data_tuples = []
+    # convert json to string
+    for data_row in data_set:
+        data_tuples.append((data_row[0], data_row[1], json.dumps(data_row[2])))
+    #print(data_tuples)
+
     insert_sql = "INSERT INTO " + table + " (event_date, data_type, data) VALUES (%s, %s, %s)"
-    # data_set = [(event_date, "cpu", 0.783), (event_date, "ram", 44568)]
+    # data_set = [(event_date, "env", '{"data_value": 100}'), (event_date, "system", '{"some_data": 10.5}')]
 
     try:
-        cur.executemany(insert_sql, data_set)
+        cur.executemany(insert_sql, data_tuples)
     except Exception as ex:
         if "UndefinedTable" == type(ex).__name__:
             print("Trying to create missing table")
@@ -146,7 +152,7 @@ def log_data(table, data_set):
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             create_table(cur, table)
-            cur.executemany(insert_sql, data_set)
+            cur.executemany(insert_sql, data_tuples)
         else:
             raise
 
@@ -162,11 +168,11 @@ def get_session_info():
     sessions_url = params["sessions_url"]
 
     session_info = {}
-    session_info["active_clients"] = 0
-    session_info["total_clients"] = 0
-    session_info["play_sessions"] = 0
-    session_info["video_transcoding"] = 0
-    session_info["audio_transcoding"] = 0
+    session_info["a"] = 0
+    session_info["t"] = 0
+    session_info["p"] = 0
+    session_info["vt"] = 0
+    session_info["at"] = 0
 
     try:
         response = requests.get(sessions_url)
@@ -178,7 +184,7 @@ def get_session_info():
             if session["DeviceId"] == session["ServerId"]:
                 continue
 
-            session_info["total_clients"] += 1
+            session_info["t"] += 1
 
             last_active = session["LastActivityDate"]  # "2020-07-18T04:08:53.1184838Z"
             last_active = last_active[0:-2] + "+0000"
@@ -187,21 +193,21 @@ def get_session_info():
             # print(last_active_ago)
 
             if last_active_ago < (5 * 60):
-                session_info["active_clients"] += 1
+                session_info["a"] += 1
 
             if session.get("NowPlayingItem"):
                 play_state = session["PlayState"]
                 if play_state["IsPaused"] is False:
-                    session_info["play_sessions"] += 1
+                    session_info["p"] += 1
 
                     # VideoDecoderIsHardware
                     # VideoEncoderIsHardware
                     transcoding_info = session.get("TranscodingInfo")
                     if transcoding_info:
                         if transcoding_info.get("IsVideoDirect") is False:
-                            session_info["video_transcoding"] += 1
+                            session_info["vt"] += 1
                         if transcoding_info.get("IsAudioDirect") is False:
-                            session_info["audio_transcoding"] += 1
+                            session_info["at"] += 1
 
     except Exception as err:
         print(err)
@@ -266,18 +272,15 @@ while True:
 
     # log event data
     event_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    server_stats = {"c": cpu_usage,
+                    "vm": mem_usage.percent,
+                    "ni": network_bits_in_sec,
+                    "no": network_bits_out_sec,
+                    "dr": disk_bytes_read_sec,
+                    "dw": disk_bytes_written_sec}
     events = [
-        (event_date, "cpu", cpu_usage),
-        (event_date, "ram", mem_usage.percent),
-        (event_date, "net_in", network_bits_in_sec),
-        (event_date, "net_out", network_bits_out_sec),
-        (event_date, "disk_read", disk_bytes_read_sec),
-        (event_date, "disk_write", disk_bytes_written_sec),
-        (event_date, "emby_active", emby_session_info["active_clients"]),
-        (event_date, "emby_total", emby_session_info["total_clients"]),
-        (event_date, "emby_playing", emby_session_info["play_sessions"]),
-        (event_date, "emby_v_trans", emby_session_info["video_transcoding"]),
-        (event_date, "emby_a_trans", emby_session_info["audio_transcoding"])
+        [event_date, "server", server_stats],
+        [event_date, "emby", emby_session_info]
     ]
     #print(events)
     log_data("events", events)

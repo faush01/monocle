@@ -1,0 +1,10 @@
+
+https://grafana.com/docs/loki/latest/
+
+https://labs.lux4rd0.com/2021/02/weatherflow-tempest-log-collector/
+
+https://grafana.com/docs/loki/latest/api/#examples-8
+
+max(max_over_time({sys="monitor"} | logfmt | unwrap cpu | __error__="" [$__interval]))
+max(first_over_time({sys="monitor"} | logfmt | unwrap cpu | __error__="" [$__interval]))
+

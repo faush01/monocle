@@ -67,8 +67,8 @@ def log_data(time_stamp, pulse_count, time_span):
 
         log_power = {
             "event_date": event_date,
-            "event_type": "ws",
-            "event_data": ws
+            "event_type": "m1",
+            "event_data": {"ws": ws, "pc": pulse_count, "ts": time_span}
         }
         data_to_log = [log_power]
 

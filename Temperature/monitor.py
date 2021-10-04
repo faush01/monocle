@@ -29,17 +29,12 @@ while True:
         print("Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(temperature, humidity))
 
         date_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_temp = {
+        log_data = {
             "event_date": date_string,
-            "event_type": "t",
-            "event_data": temperature
+            "event_type": "s1",
+            "event_data": {"t": temperature, "rh": humidity}
         }
-        log_hum = {
-            "event_date": date_string,
-            "event_type": "rh",
-            "event_data": humidity
-        }
-        log_data = [log_temp, log_hum]
+        log_data = [log_data]
 
         send_log_data(log_data)
 
