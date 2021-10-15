@@ -1,0 +1,18 @@
+insert into environment
+(event_date, data_type, data)
+select
+	event_date,
+	's1' as data_type,
+	--max(case when data_type = 't' then data else -1000 end) as t,
+	--max(case when data_type = 'rh' then data else -1000 end) as rh,
+	('{"t":' || max(case when data_type = 't' then data else -1000 end) ||
+	 ', "rh":' || max(case when data_type = 'rh' then data else -1000 end) ||
+	 ' }')::jsonb
+from environment_old
+group by event_date
+
+
+select *, (data->'c')::float
+from events
+where data_type = 'server'
+limit 100
