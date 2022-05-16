@@ -41,6 +41,11 @@ Add lines
 0 2 * * * /sbin/shutdown -r now
 ```
 
+**Download Logs
+```
+scp pi@<ip of rpi>:/home/pi/monocle/logger.log monocle.log
+```
+
 **Running Flask Web App (Optional)**
 
 `python3 flask_app.py <path to DB>`
