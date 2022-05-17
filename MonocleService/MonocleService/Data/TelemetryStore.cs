@@ -1,10 +1,17 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace MonocleService
 {
     public class TelemetryStore
     {
+        private static TelemetryStore instance = null;
+        private static readonly object padlock = new object();
+
         private string db_server = "";
         private string db_name = "";
         private string db_user = "";
@@ -12,7 +19,24 @@ namespace MonocleService
         private Dictionary<string, DateTime> last_delete_check = new Dictionary<string, DateTime>();
         private Dictionary<string, int> retention = new Dictionary<string, int>();
 
-        public TelemetryStore(IConfiguration config)
+        public static TelemetryStore GetInstance(IConfiguration config)
+        {
+            lock (padlock)
+            {
+                if (instance == null)
+                {
+                    instance = new TelemetryStore(config);
+                }
+                return instance;
+            }
+        }
+
+        private TelemetryStore()
+        {
+
+        }
+
+        private TelemetryStore(IConfiguration config)
         {
             db_server = config["DbServer:Host"];
             db_name = config["DbServer:Database"];

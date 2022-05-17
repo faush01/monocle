@@ -1,4 +1,6 @@
-﻿namespace MonocleService
+﻿using System.Collections.Generic;
+
+namespace MonocleService
 {
 
  /*
@@ -25,9 +27,9 @@
 
     public class TelemetryItem
     { 
-        public string? event_date { get; set; }
-        public string? event_type { get; set; }
-        public Dictionary<string, double>? event_data { get; set; }
+        public string event_date { get; set; }
+        public string event_type { get; set; }
+        public Dictionary<string, double> event_data { get; set; }
     }
 
 }
