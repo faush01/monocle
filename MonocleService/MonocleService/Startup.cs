@@ -17,6 +17,8 @@ namespace MonocleService
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            new SysMonitor(configuration).Start();
         }
 
         public IConfiguration Configuration { get; }
