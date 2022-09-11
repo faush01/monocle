@@ -78,7 +78,11 @@ namespace MonocleService
                     {
                         NpgsqlBatchCommand batch_cmd = new NpgsqlBatchCommand(sql);
 
-                        DateTime log_date = DateTime.Parse(telem.event_date);
+                        DateTime log_date = DateTime.Now;
+                        if (!string.IsNullOrEmpty(telem.event_date))
+                        {
+                            log_date = DateTime.Parse(telem.event_date);
+                        }
                         batch_cmd.Parameters.AddWithValue("event_date", log_date);
                         batch_cmd.Parameters.AddWithValue("data_type", telem.event_type);
                         batch_cmd.Parameters.AddWithValue("data", NpgsqlDbType.Jsonb, telem.event_data);
