@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using MonocleService.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -75,7 +76,7 @@ namespace MonocleService
             // https://docs.microsoft.com/en-us/previous-versions/ms804008(v=msdn.10)?redirectedfrom=MSDN
             // Pages Input/sec
 
-            TelemetryStore store = TelemetryStore.GetInstance(configuration);
+            TelemetryStoreSqlite store = TelemetryStoreSqlite.GetInstance(configuration);
 
             //cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             PerformanceCounter cpuCounter = new PerformanceCounter("Processor Information", "% Processor Utility", "_Total");

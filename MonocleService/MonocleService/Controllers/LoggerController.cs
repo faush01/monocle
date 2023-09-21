@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using MonocleService.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,12 +14,12 @@ namespace MonocleService.Controllers
     public class LoggerController : Controller
     {
         private IConfiguration _config;
-        private TelemetryStore store;
+        private TelemetryStoreSqlite store;
 
         public LoggerController(IConfiguration config)
         {
             _config = config;
-            store = TelemetryStore.GetInstance(_config);
+            store = TelemetryStoreSqlite.GetInstance(_config);
         }
 
         [HttpGet]

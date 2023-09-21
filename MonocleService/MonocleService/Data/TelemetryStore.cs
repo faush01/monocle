@@ -1,14 +1,15 @@
-﻿using Npgsql;
-using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using System.Linq;
+﻿//using Npgsql;
+//using NpgsqlTypes;
+//using System;
+//using System.Collections.Generic;
+//using Microsoft.Extensions.Configuration;
+//using System.Linq;
 
 namespace MonocleService
 {
     public class TelemetryStore
     {
+        /*
         private static TelemetryStore instance = null;
         private static readonly object padlock = new object();
 
@@ -141,6 +142,6 @@ namespace MonocleService
                 cmd.ExecuteNonQuery();
             }
         }
-
+        */
     }
 }
