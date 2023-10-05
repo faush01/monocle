@@ -41,10 +41,6 @@ namespace MonocleService.Controllers
                 reponce_data.Add("message", "no data");
                 return Json(reponce_data);
             }
-
-            string data_json = JsonSerializer.Serialize(telemetry_data);
-            string date_stamp = DateTime.Now.ToString(data_json);
-            Console.WriteLine(date_stamp);
             store.SaveTelemetry(telemetry_data);
 
             reponce_data.Add("message", "Telemetry Saved");

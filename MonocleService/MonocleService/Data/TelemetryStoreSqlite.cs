@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Text.Json;
+using System.IO;
 
 namespace MonocleService.Data
 {
@@ -31,12 +33,35 @@ namespace MonocleService.Data
 
         private TelemetryStoreSqlite(IConfiguration config)
         {
-            db_file_name = config["DbServer:db_file_name"];
+            db_file_name = config["DbServer:DbFileName"];
             retention = config.GetSection("DbServer:Retention").GetChildren().ToDictionary(x => x.Key, x => int.Parse(x.Value));
 
             Console.WriteLine("Telemetry Store Created");
-            Console.WriteLine("DbServer:db_file_name ({0})", db_file_name);
+            Console.WriteLine("DbServer:DbFileName   ({0})", db_file_name);
             Console.WriteLine("DbServer:Retention    ({0})", string.Join("|", retention));
+
+            VacuumDatabase();
+        }
+
+        private void VacuumDatabase()
+        {
+            FileInfo fi = new FileInfo(db_file_name);
+            Console.WriteLine("DB file size : " + fi.Length);
+
+            using (SqliteConnection conn = new SqliteConnection("Data Source=" + db_file_name))
+            {
+                conn.Open();
+                // vacuum
+                Console.WriteLine("Running DB Vacuum");
+                string vacuum_cmd = "VACUUM";
+                using (SqliteCommand cmd = new SqliteCommand(vacuum_cmd, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            fi = new FileInfo(db_file_name);
+            Console.WriteLine("DB file size : " + fi.Length);
         }
 
         public void SaveTelemetry(TelemetryData telemetry_data)
@@ -48,7 +73,10 @@ namespace MonocleService.Data
             {
                 lock (padlock)
                 {
-                    using (SqliteConnection conn = new SqliteConnection("Data Source=metrics.db"))
+                    string data_json = JsonSerializer.Serialize(telemetry_data);
+                    Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "|" + data_json);
+
+                    using (SqliteConnection conn = new SqliteConnection("Data Source=" + db_file_name))
                     {
                         conn.Open();
 
@@ -99,9 +127,11 @@ namespace MonocleService.Data
             List<string> data_items = new List<string>();
             foreach (var kvp in event_data)
             {
-                data_items.Add("\"" + kvp.Key + "\":" + kvp.Value);
+                data_items.Add("\"" + kvp.Key + "\":" + Math.Round(kvp.Value, 4));
             }
-            return "{" + string.Join(",", data_items) + "}";
+            string json_string = "{" + string.Join(",", data_items) + "}";
+            //Console.WriteLine(json_string);
+            return json_string;
         }
 
         private void CreateTable(string table_name, SqliteConnection conn)
