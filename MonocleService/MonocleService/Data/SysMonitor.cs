@@ -45,7 +45,7 @@ namespace MonocleService
             {
                 if(!gpu_usage_counters.ContainsKey(name))
                 {
-                    gpu_usage_counters[name] = new PerformanceCounter("GPU Engine", "Utilization Percentage", name);
+                    gpu_usage_counters[name] = new PerformanceCounter("GPU Engine", "Utilization Percentage", name, true);
                 }
             }
             // remove old
@@ -53,13 +53,18 @@ namespace MonocleService
             { 
                 if (!instance_names.Contains(key))
                 {
+                    PerformanceCounter pc = gpu_usage_counters[key];
                     gpu_usage_counters.Remove(key);
+                    pc.Close();
                 }
             }
         }
 
         private Dictionary<string, double> GetGpuUsage(Dictionary<string, PerformanceCounter> gpu_usage_counters)
         {
+            //g_videodecode
+            //g_videoprocessing
+            //g_3d
             Dictionary<string, double> totals = new Dictionary<string, double>();
 
             foreach (string name in gpu_usage_counters.Keys)
