@@ -1,0 +1,8 @@
+.idea
+.vs
+bin
+obj
+.config
+*.pubxml.user
+*.pubxml
+*.csproj.user
