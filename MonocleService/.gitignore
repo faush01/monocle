@@ -5,3 +5,5 @@ obj
 .config
 *.pubxml.user
 *.csproj.user
+*.db
+*.sqlite
