@@ -1,0 +1,30 @@
+# Use the official .NET SDK image for building the application
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the project files
+COPY ./MonocleService/*.csproj ./
+RUN dotnet restore
+
+# Copy the rest of the application files
+COPY ./MonocleService ./
+
+# Build the application
+RUN dotnet publish -c Release -o /out
+
+# Use the official .NET runtime image for running the application
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the published files from the build stage
+COPY --from=build /out .
+
+# Expose the port the app runs on
+EXPOSE 3456
+
+# Set the entry point for the container
+ENTRYPOINT ["dotnet", "MonocleService.dll"]

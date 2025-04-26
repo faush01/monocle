@@ -37,6 +37,13 @@ namespace MonocleService.Data
             Console.WriteLine("Telemetry Store Created");
             Console.WriteLine("DbServer:DbFilePath : {0}", db_file_path);
 
+            var envDbFilePath = Environment.GetEnvironmentVariable("DbFilePath");
+            if (!string.IsNullOrEmpty(envDbFilePath))
+            {
+                db_file_path = envDbFilePath;
+                Console.WriteLine("Enviroment variable DbFilePath loaded : {0}", db_file_path);
+            }
+
             DirectoryInfo di = new DirectoryInfo(db_file_path);
             if(!di.Exists)
             {
