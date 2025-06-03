@@ -20,12 +20,21 @@ password = '' # password of wifi
 wlan.disconnect()
 wlan.connect(ssid, password)
 
-while wlan.status() != 3:
-    print("Waiting for connection : " + str(wlan.status()))
-    led.on()
-    time.sleep(0.3)
-    led.off() 
-    time.sleep(5)
+connected = False
+while not connected:
+    print("Setting up connection to : " + ssid)
+    wlan.disconnect()
+    wlan.connect(ssid, password)    
+    time.sleep(1.0)
+    for t in range(0, 10):
+        if wlan.status() == 3:
+            connected = True
+            break
+        led.on()
+        time.sleep(0.3)
+        led.off()        
+        print("Waiting for connection : " + str(wlan.status()))
+        time.sleep(5)
 
 led.on()
 print("connected")
