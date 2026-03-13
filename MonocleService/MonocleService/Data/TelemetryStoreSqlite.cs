@@ -162,6 +162,57 @@ namespace MonocleService.Data
             }
         }
 
+        public Dictionary<string, Dictionary<string, int>> GetMetrics()
+        {
+            var metrics = new Dictionary<string, Dictionary<string, int>>();
+
+            try
+            {
+                lock (padlock)
+                {
+                    DirectoryInfo di = new DirectoryInfo(db_file_path);
+                    foreach (FileInfo fi in di.GetFiles("*.sqlite"))
+                    {
+                        string db_name = Path.GetFileNameWithoutExtension(fi.Name);
+                        var counts = new Dictionary<string, int>();
+
+                        using (SqliteConnection conn = new SqliteConnection("Data Source=" + fi.FullName))
+                        {
+                            conn.Open();
+
+                            // Check if the telemetry table exists
+                            string checkSql = "SELECT name FROM sqlite_master WHERE type='table' AND name='telemetry'";
+                            using (SqliteCommand checkCmd = new SqliteCommand(checkSql, conn))
+                            {
+                                var result = checkCmd.ExecuteScalar();
+                                if (result == null) continue;
+                            }
+
+                            string sql = "SELECT data_type, COUNT(*) as cnt FROM telemetry GROUP BY data_type";
+                            using (SqliteCommand cmd = new SqliteCommand(sql, conn))
+                            using (SqliteDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    string dataType = reader.GetString(0);
+                                    int count = reader.GetInt32(1);
+                                    counts[dataType] = count;
+                                }
+                            }
+                        }
+
+                        metrics[db_name] = counts;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return metrics;
+        }
+
         private void DeleteOld(string db_file_name)
         {
             int keep_days = 14;

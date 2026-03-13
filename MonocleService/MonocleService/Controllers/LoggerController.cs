@@ -26,8 +26,12 @@ namespace MonocleService.Controllers
         public IActionResult Get()
         {
             Console.WriteLine("Hello World");
+
+            var metrics = store.GetMetrics();
+
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("message", "Hello World");
+            data.Add("metrics", metrics);
             return Json(data);
         }
 
