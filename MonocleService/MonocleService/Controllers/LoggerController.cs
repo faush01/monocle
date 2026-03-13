@@ -25,12 +25,13 @@ namespace MonocleService.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            Console.WriteLine("Hello World");
+            // Some basic health check, we can expand this later to include more info about the service
+            Console.WriteLine("HealthPing");
 
             var metrics = store.GetMetrics();
 
             Dictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("message", "Hello World");
+            data.Add("message", "HealthPing");
             data.Add("metrics", metrics);
             return Json(data);
         }
