@@ -17,6 +17,9 @@ RUN dotnet publish -c Release -o /out
 # Use the official .NET runtime image for running the application
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
+# Set the timezone at runtime with -e TZ=Australia/Sydney
+ENV TZ=UTC
+
 # Set the working directory inside the container
 WORKDIR /app
 
