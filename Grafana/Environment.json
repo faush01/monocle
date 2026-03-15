@@ -1,0 +1,1080 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_TEMPERATURE_BEDROOM",
+      "label": "temperature_bedroom",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "frser-sqlite-datasource",
+      "pluginName": "SQLite"
+    },
+    {
+      "name": "DS_TEMPERATURE_RUMPUS",
+      "label": "temperature_rumpus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "frser-sqlite-datasource",
+      "pluginName": "SQLite"
+    },
+    {
+      "name": "DS_TEMPERATURE_POD",
+      "label": "temperature_pod",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "frser-sqlite-datasource",
+      "pluginName": "SQLite"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "frser-sqlite-datasource",
+      "name": "SQLite",
+      "version": "4.0.1"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.4.1"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_BEDROOM}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 0
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_BEDROOM}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Front\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Front\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "`C Bed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_RUMPUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Rump\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Rump\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "`C Rump",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_POD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 6,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Pod\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Pod\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "`C Pod",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_RUMPUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 10,
+        "y": 0
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh Rump\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh Rump\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "RH Rump",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_BEDROOM}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 13,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_BEDROOM}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh bed\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh bed\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "RH Bed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_RUMPUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 18,
+        "y": 0
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "hpa",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_POD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 21,
+        "y": 0
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT\n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa Pod\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "queryType": "table",
+          "rawQueryText": "SELECT\n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa Pod\"\nFROM telemetry\nORDER BY event_date DESC\nLIMIT 1",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "title": "hpa Pod",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 3
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_BEDROOM}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Front\"\nFROM telemetry\nWHERE event_date BETWEEN 1738448040 AND 1738469640\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Front\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "A",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C rump\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C rump\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "B",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Pod\"\nFROM telemetry\nWHERE event_date BETWEEN 1738448040 AND 1738469640\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.t') AS FLOAT) as \"`C Pod\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "C",
+          "timeColumns": [
+            "event_date"
+          ]
+        }
+      ],
+      "title": "Temperature",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 3
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "A",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa Pod\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.hpa') AS FLOAT) as \"hpa Pod\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "B",
+          "timeColumns": [
+            "event_date"
+          ]
+        }
+      ],
+      "title": "Barometric Pressure",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_BEDROOM}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh bed\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh bed\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "A",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_RUMPUS}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh rump\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.rh') AS FLOAT) as \"rh rump\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "B",
+          "timeColumns": [
+            "event_date"
+          ]
+        }
+      ],
+      "title": "Humidity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "${DS_TEMPERATURE_POD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "aq"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              },
+              {
+                "id": "custom.axisSoftMax",
+                "value": 6
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.aq') AS FLOAT) as \"aq\"\nFROM telemetry\nWHERE event_date BETWEEN 1773512151 AND 1773533751\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.aq') AS FLOAT) as \"aq\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "A",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.co2') AS FLOAT) as \"co2\"\nFROM telemetry\nWHERE event_date BETWEEN 1773512151 AND 1773533751\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.co2') AS FLOAT) as \"co2\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "B",
+          "timeColumns": [
+            "event_date"
+          ]
+        },
+        {
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "${DS_TEMPERATURE_POD}"
+          },
+          "queryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.voc') AS FLOAT) as \"voc\"\nFROM telemetry\nWHERE event_date BETWEEN 1773512151 AND 1773533751\nGROUP BY 1\nORDER BY 1 ASC",
+          "queryType": "table",
+          "rawQueryText": "SELECT \n\tevent_date, \n\tCAST(json_extract(data, '$.voc') AS FLOAT) as \"voc\"\nFROM telemetry\nWHERE event_date BETWEEN ${__from:date:seconds} AND ${__to:date:seconds}\nGROUP BY 1\nORDER BY 1 ASC",
+          "refId": "C",
+          "timeColumns": [
+            "event_date"
+          ]
+        }
+      ],
+      "title": "Pod Air Quality",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Environment",
+  "uid": "b90f1c1e-0a3e-4be7-b105-c7c765adb74e",
+  "version": 2,
+  "weekStart": ""
+}
