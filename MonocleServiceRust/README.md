@@ -53,7 +53,7 @@ docker run --rm --name monocle_service \
     monocle-service-rust:latest
 ```
 
-## Github Pull
+## Github Pull and Run
 
 ```
 docker image pull ghcr.io/faush01/monocle/monocleservice-rust:develop
@@ -64,6 +64,36 @@ docker run --rm --name monocle_service \
     -e DbFilePath=/monocle_data \
     --volume=monocle-docker:/monocle_data \
     ghcr.io/faush01/monocle/monocleservice-rust:develop
+```
+
+## Run Persistently (background + auto-restart)
+
+```
+docker run -d --name monocle_service \
+    --restart unless-stopped \
+    -p 3456:3456 \
+    -e TZ=Australia/Sydney \
+    -e DbFilePath=/monocle_data \
+    --volume=monocle-docker:/monocle_data \
+    ghcr.io/faush01/monocle/monocleservice-rust:develop
+```
+
+## Useful management commands:
+
+```
+docker logs -f monocle_service        # tail logs
+docker ps                             # confirm it's running
+docker stop monocle_service           # stop
+docker start monocle_service          # start again
+docker rm -f monocle_service          # remove (needed before re-running with same name)
+```
+
+## To upgrade to a newer image:
+
+```
+docker pull ghcr.io/faush01/monocle/monocleservice-rust:develop
+docker rm -f monocle_service
+# then re-run the `docker run -d ...` command above
 ```
 
 
