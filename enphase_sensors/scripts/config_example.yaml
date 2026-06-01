@@ -1,0 +1,12 @@
+account:
+  envoy_serial: 
+  password: 
+  user: 
+envoy:
+  host:
+  host_name: envoy.local
+telemetry:
+  collection_url: 
+  verbose: false
+token:
+  access_token: 
