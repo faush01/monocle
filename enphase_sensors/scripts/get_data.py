@@ -10,14 +10,7 @@ import requests
 import urllib3
 
 ENVOY_URL = "https://envoy.local/ivp/meters/readings"
-TOKEN = (
-    "eyJraWQiOiI3ZDEwMDA1ZC03ODk5LTRkMGQtYmNiNC0yNDRmOThlZTE1NmIiLCJ0eXAiOiJKV1Qi"
-    "LCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiIxMjIyMTQwNDI1ODkiLCJpc3MiOiJFbnRyZXoiLCJlbnB"
-    "oYXNlVXNlciI6Im93bmVyIiwiZXhwIjoxODA5NzMzODc1LCJpYXQiOjE3NzgxOTc4NzUsImp0aSI"
-    "6IjI4NmNiMGExLWU3NzAtNGY2My1iYTVlLWU0ODEwNThmYTIxYiIsInVzZXJuYW1lIjoibWFyYUB"
-    "ibHVlYml0LmNvbS5hdSJ9.0rKXjaqYMpUowj3OiABMix197UbOvQ18vpTvdPlu6noL_oJETmOyLv"
-    "R-QKGEUDxtBUZkYzBdv16XGt_MDVpkEg"
-)
+TOKEN = "blank"
 
 
 def fetch_meter_readings(url: str = ENVOY_URL, token: str = TOKEN, timeout: int = 10):
