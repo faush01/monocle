@@ -55,7 +55,7 @@ def main(config, last_run_data: LastRunData, verbose: bool = False) -> int:
 
     # samples timestamp
     timestamp_epoc = data[0].get("timestamp")
-    data_timestamp = datetime.fromtimestamp(timestamp_epoc)
+    data_timestamp = datetime.fromtimestamp(timestamp_epoc)  # noqa: DTZ006
     timestamp_str = data_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
 
     # Solar Production

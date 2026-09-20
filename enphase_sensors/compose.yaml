@@ -1,0 +1,15 @@
+name: enphase-sensors
+services:
+  enphase-sensors:
+    image: ghcr.io/faush01/monocle/enphase-sensors:latest
+    container_name: enphase-sensors
+    environment:
+      TZ: Australia/Melbourne
+    restart: unless-stopped
+    volumes:
+      - enphase-config:/config
+    network_mode: bridge
+
+volumes:
+  enphase-config:
+    name: enphase-config

@@ -56,6 +56,45 @@ builds the image and publishes it to:
 ghcr.io/faush01/monocle/enphase-sensors
 ```
 
+### Docker Compose
+
+From the `enphase_sensors` directory, create the service and copy its example
+configuration to the host:
+
+```shell
+docker compose --file compose.yaml create
+docker compose --file compose.yaml cp enphase-sensors:/app/config_example.yaml ./config.yaml
+```
+
+Update `config.yaml` with the account, Envoy, and telemetry settings, then copy
+it into the named configuration volume:
+
+```shell
+docker compose --file compose.yaml cp ./config.yaml enphase-sensors:/config/config.yaml
+```
+
+Retrieve the initial access token and start the logger:
+
+```shell
+docker compose --file compose.yaml run --rm --user root enphase-sensors python /app/get_token.py
+docker compose --file compose.yaml up --detach
+```
+
+Verify the token from inside the running container:
+
+```shell
+docker compose --file compose.yaml exec enphase-sensors python /app/get_usage.py
+```
+
+To refresh the token later:
+
+```shell
+docker compose --file compose.yaml exec --user root enphase-sensors python /app/get_token.py
+docker compose --file compose.yaml restart enphase-sensors
+```
+
+### Docker CLI
+
 The image contains every Python script from `scripts/` and the example
 configuration at `/app/config_example.yaml`. Create the logger container with a
 named volume, then copy the example configuration out of the container:
@@ -64,6 +103,7 @@ named volume, then copy the example configuration out of the container:
 docker volume create enphase-config
 docker create --name enphase-sensors \
   --restart unless-stopped \
+  --env TZ=Australia/Melbourne \
   --volume enphase-config:/config \
   ghcr.io/faush01/monocle/enphase-sensors:latest
 docker cp enphase-sensors:/app/config_example.yaml ./config.yaml
