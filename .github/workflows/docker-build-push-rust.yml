@@ -1,4 +1,4 @@
-name: Build and Push MonocleService (Rust) Docker Image
+name: MonocleService (Rust) Docker Image
 
 on:
   workflow_dispatch:

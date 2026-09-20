@@ -3,19 +3,23 @@
 
 from __future__ import annotations
 
+import os
 import sys
 
 import requests
 import urllib3
 import yaml
 
+config_file = os.path.join(os.environ.get("config_path", "."), "config.yaml")
 
-with open('config.yaml', 'r') as f:
+with open(config_file, 'r') as f:
     config = yaml.safe_load(f)
 
 envoy_host = config['envoy']['host']
 ENVOY_URL = f"https://{envoy_host}/ivp/meters"
 TOKEN = config['token']['access_token']
+if not TOKEN:
+    raise ValueError("Access token is not set in the configuration.")
 
 
 def fetch_meter_readings(url: str = ENVOY_URL, token: str = TOKEN, timeout: int = 10):

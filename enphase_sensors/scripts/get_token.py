@@ -1,13 +1,24 @@
 import json
+import os
+
 import requests
 import yaml
 
-with open('config.yaml', 'r') as f:
+config_file = os.path.join(os.environ.get("config_path", "."), "config.yaml")
+
+with open(config_file, 'r') as f:
     config = yaml.safe_load(f)
 
 user = config['account']['user']
 password = config['account']['password']
 envoy_serial = config['account']['envoy_serial']
+
+if not user:
+    raise ValueError("User is not set in the configuration.")
+if not password:
+    raise ValueError("Password is not set in the configuration.")
+if not envoy_serial:
+    raise ValueError("Envoy serial is not set in the configuration.")
 
 enlighten_url = 'https://enlighten.enphaseenergy.com/login/login.json'
 entrez_url = 'https://entrez.enphaseenergy.com/tokens'
@@ -29,5 +40,5 @@ print(token_raw)
 config['token']['access_token'] = token_raw
 
 # save the access token
-with open('config.yaml', 'w') as f:
+with open(config_file, 'w') as f:
     yaml.dump(config, f)

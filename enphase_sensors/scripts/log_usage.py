@@ -3,10 +3,11 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-import time
 import json
+import os
 import sys
+import time
+from datetime import datetime
 
 import requests
 import urllib3
@@ -22,15 +23,10 @@ class LastRunData:
         self.last_net_consumption_actEnergyRcvd = 0
 
 
-def load_config():
-    with open('config.yaml', 'r') as f:
+def load_config(path: str):
+    with open(os.path.join(path, 'config.yaml'), 'r') as f:
         config = yaml.safe_load(f)
     return config
-
-
-def get_token(config):
-    access_token = config['token']['access_token']
-    return access_token
 
 
 def fetch_meter_readings(config, timeout: int = 10):
@@ -39,7 +35,7 @@ def fetch_meter_readings(config, timeout: int = 10):
 
     envoy_host = config['envoy']['host']
     envoy_url = f"https://{envoy_host}/ivp/meters/readings"
-    access_token = get_token(config)
+    access_token = config['token']['access_token']
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -120,14 +116,14 @@ def main(config, last_run_data: LastRunData, verbose: bool = False) -> int:
         print(f"Net Consumption Power Dlvd Over Time : {net_consumption_power_dlvd_over_time} W")
         print(f"Net Consumption Power Rcvd Over Time : {net_consumption_power_rcvd_over_time} W")
 
-        print("")
+        print()
 
         print(f"Production Over Time (POT) : {pot} W")
         print(f"Energy Export Over Time (EOT) : {eot} W")
         print(f"Energy In Over Time (IOT) : {iot} W")
         print(f"Consumption Over Time (COT) : {cot} W")
 
-        print("")
+        print()
 
         print(f"Production        : {production_power} W\t{production_voltage} V\t{production_current} A\t{production_freq} Hz")
         print(f"NetConsumption    : {net_consumption_power} W\t{net_consumption_voltage} V\t{net_consumption_current} A\t{net_consumption_freq} Hz")
@@ -174,11 +170,16 @@ def main(config, last_run_data: LastRunData, verbose: bool = False) -> int:
 
 if __name__ == "__main__":
 
-    config = load_config()
+    path_to_config = os.environ.get("config_path", ".")
+    config = load_config(path_to_config)
+    # check if there is an access token in the config
+    if 'token' not in config or 'access_token' not in config['token'] or not config['token']['access_token'].strip():
+        print("Access token not found in config")
+        sys.exit(1)
+
     verbose = config['telemetry'].get('verbose', False)
     last_run_data = LastRunData()
 
     while True:
         main(config, last_run_data, verbose)
         time.sleep(60)
-
